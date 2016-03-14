@@ -232,7 +232,7 @@ on post-fs-data
     # we will remap this as /mnt/sdcard with the sdcard fuse tool
     mkdir /data/misc/camera 0770 camera camera
 
-    mkdir /data/media 0775 media_rw media_rw
+    mkdir /data/media 0770 media_rw media_rw
     chown media_rw media_rw /data/media
 
     mkdir /data/misc/bluetooth 0770 bluetooth bluetooth
@@ -853,7 +853,7 @@ service sdcard /system/bin/sdcard -u 1023 -g 1023 -l -r /data/media /mnt/shell/e
     oneshot
     
 
-service fuse_extSdCard /system/bin/sdcard -u 1023 -g 1023 -d -f /mnt/media_rw/extSdCard /storage/extSdCard
+service fuse_extSdCard /system/bin/sdcard -u 1023 -g 1023 -w 1023 -d -f /mnt/media_rw/extSdCard /storage/extSdCard
     class late_start
     disabled
     oneshot
@@ -979,15 +979,11 @@ on property:persist.sys.rootagent=0
     stop rootagent
 
 # umount service
-service umount_service /system/bin/umount /preload
-    disabled
-    oneshot
+
 
 # Support Preload install apks
 on property:persist.sys.storage_preload=1
     mount ext4 /dev/block/platform/msm_sdcc.1/by-name/hidden /preload nosuid nodev ro barrier=1
     setprop storage.preload.complete 1
 
-on property:persist.sys.storage_preload=0
-    start umount_service
 
