@@ -53,6 +53,8 @@ on fs
     check_fs /dev/block/platform/msm_sdcc.1/by-name/persist ext4
     mount ext4 /dev/block/platform/msm_sdcc.1/by-name/persist /persist nosuid nodev noatime noauto_da_alloc,discard,journal_async_commit,errors=panic
     mkdir /persist/data 0700 system system
+    mkdir /persist/data/sfs 0700 system system
+    mkdir /persist/data/tz 0700 system system
 
     wait /dev/block/platform/msm_sdcc.1/by-name/efs
     check_fs /dev/block/platform/msm_sdcc.1/by-name/efs ext4
@@ -83,15 +85,16 @@ on post-fs-data
     mkdir /tombstones/lpass 0771 system system
     mkdir /tombstones/wcnss 0771 system system
     mkdir /tombstones/dsps 0771 system system
+    mkdir /data/usf 0700 system system
 
 # Mobicore
     export MC_AUTH_TOKEN_PATH /efs
 
 # set device node permissions for TLC apps
-	chmod 700 /dev/mobicore
-	chmod 666 /dev/mobicore-user
-	chown system system /dev/mobicore
-	chown radio system /dev/mobicore-user
+    chmod 700 /dev/mobicore
+    chmod 666 /dev/mobicore-user
+    chown system system /dev/mobicore
+    chown radio system /dev/mobicore-user
 
 on boot
     insmod /system/lib/modules/adsprpc.ko
@@ -163,6 +166,9 @@ service qosmgrd /system/bin/qosmgr /system/etc/qosmgr_rules.xml
 service thermal-engine /system/bin/thermal-engine
    class main
    user root
+   socket thermal-send-client stream 0666 system system
+   socket thermal-recv-client stream 0660 system system
+   socket thermal-recv-passive-client stream 0666 system system
    group root
 
 # Disable Qualcomm Enterprize Security
@@ -195,6 +201,7 @@ service usf_tester /system/bin/usf_tester
     disabled
 
 service usf_epos /system/bin/usf_epos
+    class main
     user system
     group system inet
     disabled
@@ -220,6 +227,16 @@ service usf_hovering /system/bin/usf_hovering
     disabled
 
 service usf_proximity /system/bin/usf_proximity
+    user system
+    group system inet
+    disabled
+
+service usf_pairing /system/bin/usf_pairing
+    user system
+    group system inet
+    disabled
+
+service usf_sw_calib /system/bin/usf_sw_calib
     user system
     group system inet
     disabled
