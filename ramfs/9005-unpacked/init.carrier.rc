@@ -9,16 +9,6 @@ on init
 # Support Preload install apks
   mkdir /preload 0771 system system
   
-#Private Mode
-    mkdir /mnt/shell/privatemode 0700 system system
-    mkdir /storage/Private 0000 system system
-
-on post-fs-data
-#Private Mode
-    mkdir /data/privatemode 0770 system system
-    chown system system /data/privatemode
-    restorecon /data/privatemode
-
 on boot
 # permission for Input Device(Touchkey).
     chmod 0660 /sys/class/input/input2/enabled
@@ -75,11 +65,6 @@ on boot
 
 # SSWAP
     write /proc/sys/vm/swappiness 130
-
-#Private Mode
-service privatemode /system/bin/sdcard /data/privatemode /mnt/shell/privatemode 1000 1000
-    class late_start
-    oneshot
 
 on fs
   
